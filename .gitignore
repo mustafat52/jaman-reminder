@@ -1,0 +1,15 @@
+# source spreadsheet with phone numbers - keep out of git
+*.xlsx
+*.xls
+*.csv
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Vercel / node
+.vercel
+node_modules/
+.env*

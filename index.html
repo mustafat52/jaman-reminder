@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jaman Reminders</title>
+<meta name="theme-color" content="#0f5132">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1d2421;--mute:#6b7570;--line:#e4e2da;--g:#0f5132;--gl:#e3f1e8;--sent:#9aa39e;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121614;--card:#1b211e;--ink:#eef2ef;--mute:#98a39d;--line:#2a322e;--g:#3fb67a;--gl:#1d3328;--sent:#66706b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121614;--card:#1b211e;--ink:#eef2ef;--mute:#98a39d;--line:#2a322e;--g:#3fb67a;--gl:#1d3328;--sent:#66706b;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:14px 16px 10px;border-bottom:1px solid var(--line);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1{font-size:20px;margin:0 0 2px}
+.sub{color:var(--mute);font-size:14px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.sub button{background:none;border:0;color:var(--mute);text-decoration:underline;font:inherit;padding:4px}
+input{width:100%;margin-top:10px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+ul{list-style:none;margin:0;padding:8px 12px 40px;max-width:640px;margin-inline:auto}
+li{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 10px 10px 14px;margin-top:8px}
+li .who{flex:1;min-width:0}
+.nm{font-weight:600;overflow-wrap:anywhere}
+.ph{color:var(--mute);font-size:14px}
+.tag{font-size:13px;color:#a05a00}
+.btn{flex:none;min-width:92px;text-align:center;padding:11px 12px;border-radius:10px;background:var(--g);color:#fff;text-decoration:none;font-weight:600;font-size:15px}
+li.sent{opacity:.6}
+li.sent .btn{background:var(--gl);color:var(--g)}
+li.none .btn{background:transparent;color:var(--sent);border:1px dashed var(--line);pointer-events:none}
+</style></head><body>
+<header>
+<h1>Jaman reminders</h1>
+<div class="sub"><span id="count"></span><button id="reset">Clear ticks</button></div>
+<input id="q" type="search" placeholder="Search name or number" autocomplete="off">
+</header>
+<ul id="list"></ul>
+<script>
+const MSG = "Reminder for\n*Chellum Jaman*\nTomorrow, 15th Nov, Sunday at 8pm in\nMohammedi Masjid Mawaid\n\nRegards,\nTaj Family.";
+const PEOPLE = [{"n": "amil sahab", "p": "8359032921", "t": ""}, {"n": "head moallim", "p": "8269898453", "t": ""}, {"n": "shk zoher / hussain ezzi", "p": "9652378652", "t": ""}, {"n": "shk. Mohd. / hussain Petrol", "p": "9849030752", "t": ""}, {"n": "Shk. Zoeb / hatim rampura", "p": "9676247252", "t": ""}, {"n": "shk ammar ezzi", "p": "9291495156", "t": ""}, {"n": "shk hussain shuj", "p": "9885201352", "t": ""}, {"n": "shk. Taiyeb / quresh ezzi", "p": "9666899772", "t": ""}, {"n": "shk saleem arastu", "p": "9392485351", "t": ""}, {"n": "shk. Irfan bhai", "p": "9849068958", "t": ""}, {"n": "shk hasan lokhand", "p": "9414183786", "t": ""}, {"n": "shk. Joher rangoon", "p": "9848051524", "t": ""}, {"n": "shk shabbir / abbas rangon", "p": "9246540152", "t": ""}, {"n": "shk. Ibrahim vohra", "p": "9346011052", "t": ""}, {"n": "shk qaid johar ragib", "p": "9490749787", "t": "out of station"}, {"n": "shk zoher / khuzema shajap", "p": "9849075454", "t": ""}, {"n": "shk behlul mamuwala", "p": "9840564605", "t": ""}, {"n": "shk. Fakhruddin lohawala", "p": "9959976452", "t": ""}, {"n": "shk. Yousuf dahodwala", "p": "9246545252", "t": ""}, {"n": "shk. Naeem / m aquib ezzi", "p": "9885175252", "t": ""}, {"n": "mulla hussain mukadam", "p": "9848699782", "t": ""}, {"n": "mulla murtaza rampura", "p": "9550253952", "t": ""}, {"n": "mulla idris ezzi", "p": "9849642152", "t": ""}, {"n": "m. shabbir bhai alotewala", "p": "9106886035", "t": ""}, {"n": "mulla abde ali jannaty", "p": "9849935877", "t": ""}, {"n": "mulla mustafa/ taher hamid", "p": "9666526671", "t": ""}, {"n": "mulla saifee pediwala", "p": "9398973005", "t": ""}, {"n": "mulla burhanuddin bandeali", "p": "9550672378", "t": ""}, {"n": "mulla mohammed chass", "p": "9849041278", "t": ""}, {"n": "mulla shabbir / hussain bhop", "p": "9885778672", "t": ""}, {"n": "mulla hussain topi", "p": "9247414786", "t": ""}, {"n": "mudar nagpurwala", "p": "9885114077", "t": ""}, {"n": "saifee topiwala", "p": "9247494786", "t": ""}, {"n": "abbas / hussain yamani", "p": "8985753264", "t": ""}, {"n": "burhanuddin sadri", "p": "9602220138", "t": ""}, {"n": "murtaza mehta", "p": "9849377513", "t": ""}, {"n": "arab", "p": "8279208513", "t": ""}, {"n": "ali asgar classic", "p": "9701574853", "t": "farida, fatema"}, {"n": "huzefa alwala", "p": "9848486452", "t": "hamida, tasneem"}, {"n": "ali akbar tarwala", "p": "9849009530", "t": ""}, {"n": "mufaddal tarwala", "p": "9885795015", "t": ""}, {"n": "mustafa tarwala", "p": "9393012872", "t": ""}, {"n": "saifee, hakim alwala/ hatim", "p": "9989925272", "t": "mubareka"}, {"n": "kaizar bcom", "p": "9885291288", "t": ""}, {"n": "naser taj", "p": "8374268661", "t": "fatema taj"}, {"n": "shabbir lightwala", "p": "9700645652", "t": ""}, {"n": "ali asgar amalner", "p": "9989255752", "t": "tasnim amaln"}, {"n": "sajjad shikari", "p": "9885694697", "t": ""}, {"n": "hasan stationwala", "p": "9971437711", "t": ""}, {"n": "yousuf kanch", "p": "9949918521", "t": ""}, {"n": "hussain light", "p": "8977435241", "t": ""}, {"n": "juzer rapuwara", "p": "9949118552", "t": ""}, {"n": "murtaza alwala", "p": "9291215176", "t": "fatema, umme salma"}, {"n": "juzer jalgaon", "p": "9848812290", "t": ""}, {"n": "moiz kagalwala", "p": "9703425852", "t": ""}, {"n": "hussain sethji", "p": "9381491807", "t": ""}, {"n": "yousuf alfa", "p": "9848048928", "t": ""}, {"n": "murtaza amravatiwala", "p": "9246243497", "t": ""}, {"n": "amir / basit jannaty", "p": "", "t": ""}, {"n": "juzer royal glass", "p": "9908506752", "t": "doubtful"}, {"n": "zoher royal glass", "p": "9849222687", "t": ""}, {"n": "shabbir royal", "p": "9848063552", "t": ""}, {"n": "mustafa royal", "p": "9949375352", "t": ""}, {"n": "qutub qamri", "p": "7416840537", "t": ""}, {"n": "baqir kagalwala", "p": "9394539794", "t": ""}, {"n": "ali asgar tezabwala", "p": "9977524672", "t": ""}, {"n": "taiyabi stores", "p": "9246590527", "t": ""}, {"n": "asgar alotewala", "p": "9381695522", "t": ""}, {"n": "zainuddin alotewala", "p": "9959289786", "t": ""}, {"n": "qutbuddin alotwala", "p": "7416112876", "t": ""}, {"n": "amir, mufadal, ibrahim taj", "p": "9949972076", "t": "mariya, arwa"}, {"n": "jaleel taj", "p": "9908022333", "t": ""}, {"n": "qamar taj", "p": "9676062452", "t": "qamar puppi"}, {"n": "moiz /mohd dhanera", "p": "8142583752", "t": ""}, {"n": "huzefa / ibrahim dhanera", "p": "9884960921", "t": ""}, {"n": "qasim / hussain burhani", "p": "7702012151", "t": ""}, {"n": "taher ezzi", "p": "6300911849", "t": ""}, {"n": "hussain kagal", "p": "8801976752", "t": ""}, {"n": "adam crockery", "p": "8247301374", "t": ""}, {"n": "hasan janaty", "p": "6302228208", "t": ""}, {"n": "zoher nomani", "p": "9346613535", "t": ""}, {"n": "abid bata", "p": "9393327391", "t": ""}, {"n": "ashfaq bata", "p": "9701371315", "t": ""}, {"n": "mohd plumber", "p": "8390058440", "t": ""}, {"n": "home", "p": "9885465552", "t": ""}, {"n": "tahera ghadiyali", "p": "", "t": ""}, {"n": "abid bhai gallwala", "p": "9393306232", "t": ""}, {"n": "huzefa ca", "p": "9849098151", "t": ""}, {"n": "pavez shakarngar", "p": "9347009461", "t": ""}, {"n": "murtaza shikari", "p": "8790901752", "t": ""}, {"n": "mustafa kagal giddu", "p": "7032005951", "t": ""}, {"n": "zoeb bhai don", "p": "9849220352", "t": ""}, {"n": "adnan lokhand", "p": "9440726704", "t": ""}, {"n": "Shireen mami / abbas", "p": "", "t": "shireen mami"}, {"n": "Shabbir phuppa", "p": "", "t": "rashida pupi"}, {"n": "Shabbir khotaliya", "p": "9440104772", "t": ""}, {"n": "Ali asgar narsinghwala", "p": "", "t": ""}, {"n": "shabbir chandiwala", "p": "8686027862", "t": ""}, {"n": "mohd nanderbar", "p": "8790397608", "t": "out of station"}, {"n": "ali asgar burhani", "p": "9052646051", "t": ""}, {"n": "hashim bhai", "p": "", "t": ""}, {"n": "azhar kanchwala", "p": "9000603786", "t": ""}, {"n": "parvez abdul qayum bata", "p": "9391018233", "t": ""}, {"n": "taher putliwala", "p": "", "t": ""}, {"n": "shoeb karori", "p": "", "t": ""}, {"n": "Tasneem bata", "p": "", "t": ""}, {"n": "Idris Sabir", "p": "8103818372", "t": ""}, {"n": "head moallim (husain alam)", "p": "9753779152", "t": ""}];
+const KEY="jaman-sent-v1";
+let sent={};
+try{sent=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(sent))}catch(e){}}
+const list=document.getElementById("list"),q=document.getElementById("q"),count=document.getElementById("count");
+function render(){
+  const s=q.value.trim().toLowerCase();
+  list.innerHTML="";
+  let done=0,total=0;
+  PEOPLE.forEach((p,i)=>{
+    if(p.p){total++; if(sent[i])done++;}
+    if(s&&!(p.n.toLowerCase().includes(s)||p.p.includes(s)))return;
+    const li=document.createElement("li");
+    if(!p.p)li.className="none"; else if(sent[i])li.className="sent";
+    const who=document.createElement("div");who.className="who";
+    const nm=document.createElement("div");nm.className="nm";nm.textContent=p.n;
+    const ph=document.createElement("div");ph.className="ph";ph.textContent=p.p||"No number";
+    who.append(nm,ph);
+    if(p.t){const t=document.createElement("div");t.className="tag";t.textContent=p.t;who.append(t)}
+    const a=document.createElement("a");a.className="btn";
+    if(p.p){
+      a.href="https://wa.me/91"+p.p+"?text="+encodeURIComponent(MSG);
+      a.target="_blank";a.rel="noopener";
+      a.textContent=sent[i]?"Sent ✓":"Send reminder";
+      a.addEventListener("click",()=>{sent[i]=1;save();setTimeout(render,400)});
+    }else{a.textContent="No number"}
+    li.append(who,a);list.append(li);
+  });
+  count.textContent=done+" of "+total+" reminded";
+}
+q.addEventListener("input",render);
+document.getElementById("reset").addEventListener("click",()=>{if(confirm("Clear all sent ticks?")){sent={};save();render()}});
+render();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{})})}
+</script></body></html>
